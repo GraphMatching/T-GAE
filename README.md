@@ -27,3 +27,32 @@ All data used are inclueded in the data.zip file, please run the following comma
 unzip data.zip
 ```
 
+## Graph Matching
+To run the experiments for graph matching in Section 5.3 please run:
+```
+python graphMatching.py
+```
+
+To run on specific dataset, perturbation model and level, please run:
+```
+python graphMatching.py --dataset celegans --model uniform --level 0.01
+```
+where dataset is one of {celegans, arenas, douban, cora, dblp, coauthor_cs}
+perturbation model is one of {uniform, degree}
+level is one of {0, 0.01, 0.05}
+
+## Sub-graph Matching
+To run the experiments for sub graph matching in Section 5.4, please run:
+```
+python subgraphMatching.py
+```
+
+To select dataset, please run:
+```
+python subgraphMatching.py --dataset ACM_DBLP
+```
+where ACM_DBLP is one of {ACM_DBLP, Douban Online_Offline}
+
+## License
+MIT
+
