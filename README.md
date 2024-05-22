@@ -37,8 +37,8 @@ To run on specific dataset, perturbation model and level, please run:
 ```
 python graphMatching.py --dataset celegans --model uniform --level 0.01
 ```
-where dataset is one of {celegans, arenas, douban, cora, dblp, coauthor_cs}
-perturbation model is one of {uniform, degree}
+where dataset is one of {celegans, arenas, douban, cora, dblp, coauthor_cs},
+perturbation model is one of {uniform, degree},
 level is one of {0, 0.01, 0.05}
 
 ## Sub-graph Matching
