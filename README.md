@@ -33,9 +33,9 @@ To run the experiments for graph matching in Section 5.2 please run:
 python graphMatching.py
 ```
 
-To choose dataset, perturbation model and level, matching algorithm, or evaluation interval, please follow this example:
+The above command will run Celegans on 0 perturbation level by default. To choose dataset, perturbation model and level, matching algorithm, or evaluation interval, please follow this example:
 ```
-python graphMatching.py --dataset celegans --model uniform --level 0.01 --algorithm greedy --eval_interval 1
+python graphMatching.py --dataset celegans --model uniform --level 0 --algorithm greedy --eval_interval 1
 ```
 where dataset is one of {celegans, arenas, douban, cora, dblp, coauthor_cs}, perturbation model is one of {uniform, degree}, level is one of {0, 0.01, 0.05}, algorithm is one of {greedy, exact, approxNN}, for small sized graphs (Celegans, Arenas), we suggest to run exact for better performance. For 0 perturbation level, we suggest run approxNN for better efficiency. To sppedup experiments, you can set eval_interval larger, but this may not achieve the best performance. 
 
