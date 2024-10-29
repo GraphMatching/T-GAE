@@ -4,36 +4,7 @@ from munkres import Munkres
 from tqdm import tqdm
 from scipy.sparse import csr_matrix
 
-def greedy_match(X):
-    X = X.cpu().numpy()
-    m, n = X.shape
-    minSize = min(m, n)
-    usedRows = np.zeros(m, dtype=bool)
-    usedCols = np.zeros(n, dtype=bool)
-    maxList = np.zeros(minSize)
-    row = np.zeros(minSize, dtype=int)
-    col = np.zeros(minSize, dtype=int)
-    x = X.flatten()
-    ix = np.argsort(-x)
-    matched = 0
-    index = 0
-    while matched < minSize:
-        ipos = ix[index]
-        jc = ipos // m
-        ic = ipos % m
-        if not usedRows[ic] and not usedCols[jc]:
-            row[matched] = ic
-            col[matched] = jc
-            maxList[matched] = x[ipos]
-            usedRows[ic] = True
-            usedCols[jc] = True
-            matched += 1
-        index += 1
-    data = np.ones(minSize)
-    M = csr_matrix((data, (row, col)), shape=(m, n))
-    return M
-
-def get_match(D,device):
+def greedy_hungarian(D,device):
     P = torch.zeros_like(D)
     size = D.shape[0]
     index_S = [i for i in range(size)]
@@ -60,6 +31,17 @@ def hungarian(D):
         P[r][c] = 1
         total += matrix[r][c]
     return P.t()
+
+def approximate_NN(S_emb, S_hat_emb):
+    index_S = torch.squeeze(torch.argsort(S_emb, dim=0)).cpu()
+    index_S_hat = torch.squeeze(torch.argsort(S_hat_emb, dim=0)).cpu()
+    n = index_S.shape[0]
+    P = torch.zeros(n,n)
+    for i in range(P.shape[0]):
+        P[index_S_hat[i]][index_S[i]] = 1
+    return P
+
+
 
 
 
