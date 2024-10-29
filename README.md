@@ -1,10 +1,10 @@
-# Network-Alignment-with-Transferable-Graph-Autoencoders
+# T-GAE: Transferable Graph Autoencoder for Network Alignment
 
-This repository contains code for the paper Network Alignment with Transferable Graph Autoencoders.
+This repository contains code for the paper T-GAE: Transferable Graph Autoencoder for Network Alignment.
 
 Abstract: 
 
-Network alignment is the task of establishing one-to-one correspondences between the nodes of different graphs and finds a plethora of applications in high-impact domains. However, this task is known to be NP-hard in its general form, and existing algorithms do not scale up as the size of the graphs increases. To tackle both challenges we propose a novel generalized graph autoencoder architecture, designed to extract powerful and robust node embeddings, that are tailored to the alignment task. We prove that the generated embeddings are associated with the eigenvalues and eigenvectors of the graphs and can achieve more accurate alignment compared to classical spectral methods. Our proposed framework also leverages transfer learning and data augmentation to achieve efficient network alignment at a large scale without retraining. Extensive experiments on both network and sub-network alignment with real-world graphs provide corroborating evidence supporting the effectiveness and scalability of the proposed approach.
+Network alignment is the task of establishing one-to-one correspondences between the nodes of different graphs. Although finding a plethora of applications in high-impact domains, this task is known to be NP-hard in its general form. Existing optimization algorithms do not scale up as the size of the graphs increases. While being able to reduce the matching complexity, current GNN approaches fit a deep neural network on each graph and requires re-train on unseen samples, \rebuttal{which is time and memory inefficient}. To tackle both challenges we propose T-GAE, \rebuttal{a transferable graph autoencoder framework that leverages transferability and stability of GNNs} to achieve efficient network alignment on out-of-distribution graphs without retraining. We prove that \rebuttal{GNN-generated embeddings can achieve more accurate alignment compared to classical spectral methods}. Our experiments on real-world benchmarks demonstrate that T-GAE outperforms the state-of-the-art optimization method and the best GNN approach by up to 38.7\% and 50.8\%, respectively, while being able to reduce 90\% of the training time when matching out-of-distribution large scale networks. \rebuttal{We conduct ablation studies to highlight the effectiveness of the proposed encoder architecture and training objective in enhancing the expressiveness of GNNs to match perturbed graphs. T-GAE is also proved to be flexible to utilize matching algorithms of different complexities.
 
 ## Code overview
 
@@ -28,7 +28,7 @@ unzip data.zip
 ```
 
 ## Graph Matching
-To run the experiments for graph matching in Section 5.3 please run:
+To run the experiments for graph matching in Section 5.2 please run:
 ```
 python graphMatching.py
 ```
@@ -42,7 +42,7 @@ perturbation model is one of {uniform, degree},
 level is one of {0, 0.01, 0.05}
 
 ## Sub-graph Matching
-To run the experiments for sub graph matching in Section 5.4, please run:
+To run the experiments for sub graph matching in Section 5.3, please run:
 ```
 python subgraphMatching.py
 ```
