@@ -4,7 +4,7 @@ from scipy.io import loadmat
 from model import *
 from utils import *
 
-def fit_GAE_real(data, no_samples, GAE, epoch, train_loader, train_features, device, lr, test_pairs):
+def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features, device, lr, test_pairs):
     best_hitAtOne = 0
     best_hitAtFive = 0
     best_hitAtTen = 0
@@ -145,7 +145,7 @@ def main(args):
         train_features["DBLP"] = [torch.from_numpy(b["x2"]).float()]
         test_pairs = b['test_pairs'].astype(np.int32)
         NUM_HIDDEN_LAYERS = 12
-        HIDDEN_DIM = 1024
+        HIDDEN_DIM = [1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024]
         output_feature_size = 1024
         lr = 0.0001
         epoch = 50
@@ -160,28 +160,21 @@ def main(args):
         train_features["Online"] = [torch.from_numpy(f1).float()]
         train_features["Offline"] = [torch.from_numpy(f2).float()]
         NUM_HIDDEN_LAYERS = 6
-        HIDDEN_DIM = 512
+        HIDDEN_DIM = [512,512,512,512,512,512,512]
         output_feature_size = 512
         lr = 0.0001
         epoch = 20
-
-    encoder = "GIN"
-    use_input_augmentation = True
-    use_output_augmentation = False
     print("Loading training datasets")
     train_loader = {}
     for dataset in train_set:
         train_loader[dataset] = [load_adj(dataset)]
-    model = GAE(NUM_HIDDEN_LAYERS,
+    model = TGAE(NUM_HIDDEN_LAYERS,
                 input_dim,
                 HIDDEN_DIM,
-                output_feature_size, activation=F.relu,
-                use_input_augmentation=use_input_augmentation,
-                use_output_augmentation=use_output_augmentation,
-                encoder=encoder).to(device)
+                output_feature_size).to(device)
     print("Generating training features")
     print("Fitting model")
-    fit_GAE_real(data, len(train_set) * (1 + 1), model, epoch, train_loader, train_features, device,
+    fit_TGAE_subgraph(data, len(train_set) * (1 + 1), model, epoch, train_loader, train_features, device,
             lr,test_pairs)
 
 def parse_args():

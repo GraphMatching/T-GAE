@@ -2,7 +2,41 @@ import scipy
 from graphMatching import *
 from subgraphMatching import *
 
-def test_matching(GAE, S_hat_samples, p_samples, S_hat_features, S_emb, device, metric):
+def load_adj(dataset):
+    if (dataset == "celegans"):
+        S = torch.load("data/celegans.pt")
+    elif(dataset == "arenas"):
+        S = torch.load("data/arenas.pt")
+    elif (dataset == "douban"):
+        S = torch.load("data/douban.pt")
+    elif(dataset == "Online"):
+        S = torch.load("data/online.pt")
+    elif(dataset == "Offline"):
+        S = torch.load("data/offline.pt")
+    elif (dataset == "ACM"):
+        S = torch.load("data/ACM.pt")
+    elif (dataset == "DBLP"):
+        S = torch.load("data/DBLP.pt")
+    else:
+        filepath = "data/" + dataset + ".npz"
+        loader = load_npz(filepath)
+        data = loader["adj_matrix"]
+        samples = data.shape[0]
+        features = data.shape[1]
+        values = data.data
+        coo_data = data.tocoo()
+        indices = torch.LongTensor([coo_data.row, coo_data.col])
+        S = torch.sparse.FloatTensor(indices, torch.from_numpy(values).float(), [samples, features]).to_dense()
+        if (not torch.all(S.transpose(0, 1) == S)):
+            S = torch.add(S, S.transpose(0, 1))
+        S = S.int()
+        ones = torch.ones_like(S)
+        S = torch.where(S > 1, ones, S)
+    return S
+
+
+
+def test_matching(TGAE, S_hat_samples, p_samples, S_hat_features, S_emb, device, algorithm, metric):
     if (metric == "accuracy"):
         results = []
     else:
@@ -19,10 +53,18 @@ def test_matching(GAE, S_hat_samples, p_samples, S_hat_features, S_emb, device, 
                                             torch.FloatTensor(adj_norm[1]),
                                             torch.Size(adj_norm[2])).to(device)
         initial_feature = S_hat_features[i].to(device)
-        z = GAE(initial_feature, adj_norm).detach()
+        z = TGAE(initial_feature, adj_norm).detach()
         D = torch.cdist(S_emb, z, p=2)
         if (metric == "accuracy"):
-            P_HG = get_match(D, device)
+            if(algorithm == "greedy"):
+                P_HG = greedy_hungarian(D, device)
+            elif(algorithm == "exact"):
+                P_HG = hungarian(D)
+            elif(algorithm == "approxNN"):
+                P_HG = approximate_NN(S_emb,z)
+            else:
+                print("Matching algorithm undefined")
+                exit()
             c = 0
             P = p_samples[i]
             for j in range(P_HG.size(0)):
@@ -67,12 +109,9 @@ def test_matching(GAE, S_hat_samples, p_samples, S_hat_features, S_emb, device, 
 
     if (metric == "accuracy"):
         results = np.array(results)
-        # print(results)
         avg = np.average(results)
         std = np.std(results)
         return avg, std
-        print("Correct number of matchings is " + str(avg)[:6] + "+-" + str(std)[:6])
-        print()
     else:
         hitAtOne = np.average(np.array(results["hit@1"]))
         stdAtOne = np.std(np.array(results["hit@1"]))
@@ -105,7 +144,6 @@ def gen_test_set(device,S, no_samples_each_level, perturbation_levels,method):
         num_edges = int(torch.count_nonzero(S).item() / 2)
         total_purturbations = int(num_edges*level)
         if(method == "degree"):
-            #print("Preprocessing degree probability distribution")
             S = torch.triu(S, diagonal=0)
             ones_long = torch.ones((S.shape[0], 1)).type(torch.LongTensor)
             ones_int = torch.ones((S.shape[0], 1)).type(torch.IntTensor)
